@@ -41,7 +41,7 @@ module AssetSync
     attr_accessor :rackspace_username, :rackspace_api_key, :rackspace_auth_url
 
     # Google Storage
-    attr_accessor :google_storage_secret_access_key, :google_storage_access_key_id
+    attr_accessor :google_json_key_string
 
     # Azure Blob with Fog::AzureRM
     attr_accessor :azure_storage_account_name
@@ -56,8 +56,7 @@ module AssetSync
     validates :aws_secret_access_key, :presence => true, :if => proc {aws? && !aws_iam?}
     validates :rackspace_username,    :presence => true, :if => :rackspace?
     validates :rackspace_api_key,     :presence => true, :if => :rackspace?
-    validates :google_storage_secret_access_key,  :presence => true, :if => :google?
-    validates :google_storage_access_key_id,      :presence => true, :if => :google?
+    validates :google_json_key_string,  :presence => true, :if => :google?
 
     def initialize
       self.fog_region = nil
@@ -171,8 +170,7 @@ module AssetSync
       self.rackspace_username     = yml["rackspace_username"]
       self.rackspace_auth_url     = yml["rackspace_auth_url"] if yml.has_key?("rackspace_auth_url")
       self.rackspace_api_key      = yml["rackspace_api_key"]
-      self.google_storage_secret_access_key = yml["google_storage_secret_access_key"]
-      self.google_storage_access_key_id     = yml["google_storage_access_key_id"]
+      self.google_json_key_string = yml["google_json_key_string"]
       self.existing_remote_files  = yml["existing_remote_files"] if yml.has_key?("existing_remote_files")
       self.gzip_compression       = yml["gzip_compression"] if yml.has_key?("gzip_compression")
       self.manifest               = yml["manifest"] if yml.has_key?("manifest")
@@ -232,8 +230,7 @@ module AssetSync
         options.merge!({ :rackspace_auth_url => rackspace_auth_url }) if rackspace_auth_url
       elsif google?
         options.merge!({
-          :google_storage_secret_access_key => google_storage_secret_access_key,
-          :google_storage_access_key_id => google_storage_access_key_id
+          :google_json_key_string => google_json_key_string
         })
         options.merge!({:region => fog_region}) if fog_region
       elsif azure_rm?
